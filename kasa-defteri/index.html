@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Beyinsiz Aleyna'nın Kasa Defteri</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="lock-screen" id="lock-screen">
+    <form class="lock-card" id="lock-form">
+      <h2>🔒 Kasa Defteri</h2>
+      <p>Bu sayfayı görüntülemek için şifre girin.</p>
+      <input type="password" id="lock-password" placeholder="Şifre" autocomplete="off" required>
+      <button type="submit" class="btn btn-accent">Giriş Yap</button>
+      <p class="lock-error" id="lock-error" hidden>Şifre yanlış, tekrar deneyin.</p>
+    </form>
+  </div>
+
+  <div id="app-root" hidden>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>Beyinsiz Aleyna'nın Kasa Defteri</h1>
+      <button id="add-btn" class="btn btn-accent">+ Yeni Kayıt</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- Özet Kartları -->
+    <section class="summary-grid" id="summary-grid">
+      <div class="summary-card income">
+        <h3>Toplam Gelir</h3>
+        <div class="summary-amounts" id="summary-income"></div>
+      </div>
+      <div class="summary-card expense">
+        <h3>Toplam Gider</h3>
+        <div class="summary-amounts" id="summary-expense"></div>
+      </div>
+      <div class="summary-card balance">
+        <h3>Net Bakiye</h3>
+        <div class="summary-amounts" id="summary-balance"></div>
+      </div>
+      <div class="summary-card treat">
+        <h3>Toplam İkram</h3>
+        <div class="summary-amounts" id="summary-treat"></div>
+      </div>
+    </section>
+
+    <!-- Filtreler -->
+    <section class="filter-bar">
+      <div class="filter-chips" id="filter-chips">
+        <button class="chip active" data-range="today">Bugün</button>
+        <button class="chip" data-range="yesterday">Dün</button>
+        <button class="chip" data-range="week">Bu Hafta</button>
+        <button class="chip" data-range="month">Bu Ay</button>
+        <button class="chip" data-range="custom">Özel Tarih</button>
+        <button class="chip" data-range="range">Tarih Aralığı</button>
+      </div>
+      <div class="filter-dates" id="filter-dates">
+        <label class="date-field" id="custom-date-field" hidden>
+          Tarih
+          <input type="date" id="custom-date">
+        </label>
+        <label class="date-field" id="range-start-field" hidden>
+          Başlangıç
+          <input type="date" id="range-start">
+        </label>
+        <label class="date-field" id="range-end-field" hidden>
+          Bitiş
+          <input type="date" id="range-end">
+        </label>
+      </div>
+    </section>
+
+    <!-- Tablo -->
+    <section class="table-card">
+      <div class="table-header">
+        <h2 id="table-title">Bugünkü Kayıtlar</h2>
+        <span class="table-count" id="table-count">0 kayıt</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Açıklama</th>
+              <th>Kategori</th>
+              <th>Tür</th>
+              <th>Tutar</th>
+              <th>Ödeme</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <p class="empty-state" id="empty-state" hidden>Bu tarih aralığında kayıt bulunmuyor.</p>
+    </section>
+  </main>
+
+  <!-- Kayıt Ekle/Düzenle Modal -->
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Yeni Kayıt</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <form id="record-form">
+        <input type="hidden" id="record-id">
+
+        <div class="type-toggle">
+          <button type="button" class="type-btn income active" data-type="income">Gelir</button>
+          <button type="button" class="type-btn expense" data-type="expense">Gider</button>
+          <button type="button" class="type-btn treat" data-type="treat">İkram</button>
+        </div>
+
+        <label class="field">
+          Açıklama
+          <input type="text" id="field-description" required placeholder="Örn. Kahve satışı">
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            Tutar
+            <input type="number" id="field-amount" required min="0" step="0.01" placeholder="0.00">
+          </label>
+          <label class="field">
+            Para Birimi
+            <select id="field-currency">
+              <option value="TRY">₺ TRY</option>
+              <option value="EUR">€ EUR</option>
+              <option value="USD">$ USD</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            Tarih
+            <input type="date" id="field-date" required>
+          </label>
+          <label class="field">
+            Kategori (isteğe bağlı)
+            <input type="text" id="field-category" placeholder="Örn. Malzeme">
+          </label>
+        </div>
+
+        <label class="field">
+          Ödeme Yöntemi
+          <select id="field-payment">
+            <option value="cash">Nakit</option>
+            <option value="card">Kredi Kartı</option>
+          </select>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-btn">Vazgeç</button>
+          <button type="submit" class="btn btn-accent">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
