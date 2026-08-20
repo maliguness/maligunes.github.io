@@ -148,6 +148,30 @@ body {
   background: var(--surface-alt);
 }
 
+.btn-danger {
+  background: var(--expense);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #c96f61;
+}
+
+.confirm-modal {
+  max-width: 380px;
+}
+
+.confirm-modal h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.confirm-modal p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 1.25rem;
+}
+
 .btn:active {
   transform: scale(0.98);
 }

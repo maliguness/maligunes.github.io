@@ -241,13 +241,35 @@ document.getElementById('table-body').addEventListener('click', e => {
   const editId = e.target.dataset.edit;
   const deleteId = e.target.dataset.delete;
   if (editId) openModal(editId);
-  if (deleteId) {
-    if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
-      records = records.filter(r => r.id !== deleteId);
-      saveRecords();
-      render();
-    }
+  if (deleteId) openConfirmDelete(deleteId);
+});
+
+// ---- Delete confirmation modal ----
+const confirmOverlay = document.getElementById('confirm-overlay');
+let pendingDeleteId = null;
+
+function openConfirmDelete(id) {
+  pendingDeleteId = id;
+  confirmOverlay.hidden = false;
+}
+
+function closeConfirmDelete() {
+  confirmOverlay.hidden = true;
+  pendingDeleteId = null;
+}
+
+document.getElementById('confirm-delete').addEventListener('click', () => {
+  if (pendingDeleteId) {
+    records = records.filter(r => r.id !== pendingDeleteId);
+    saveRecords();
+    render();
   }
+  closeConfirmDelete();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', closeConfirmDelete);
+confirmOverlay.addEventListener('click', e => {
+  if (e.target === confirmOverlay) closeConfirmDelete();
 });
 
 // ---- Modal ----
