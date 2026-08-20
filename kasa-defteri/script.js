@@ -87,7 +87,7 @@ function getDateRange() {
     case 'month':
       return { start: startOfMonth(today), end: endOfMonth(today), label: 'Bu Ayki Kayıtlar' };
     case 'custom': {
-      const val = document.getElementById('custom-date').value || today;
+      const val = selectedCustomDate || today;
       return { start: val, end: val, label: `${formatDate(val)} Kayıtları` };
     }
     case 'range': {
@@ -222,8 +222,12 @@ document.getElementById('filter-chips').addEventListener('click', e => {
   document.getElementById('range-start-field').hidden = currentRange !== 'range';
   document.getElementById('range-end-field').hidden = currentRange !== 'range';
 
-  if (currentRange === 'custom' && !document.getElementById('custom-date').value) {
-    document.getElementById('custom-date').value = todayStr();
+  if (currentRange === 'custom') {
+    const [y, m] = selectedCustomDate.split('-').map(Number);
+    calendarViewYear = y;
+    calendarViewMonth = m - 1;
+    updateCalendarToggleLabel();
+    renderCalendar();
   }
   if (currentRange === 'range') {
     if (!document.getElementById('range-start').value) document.getElementById('range-start').value = todayStr();
@@ -232,9 +236,77 @@ document.getElementById('filter-chips').addEventListener('click', e => {
   render();
 });
 
-document.getElementById('custom-date').addEventListener('change', render);
 document.getElementById('range-start').addEventListener('change', render);
 document.getElementById('range-end').addEventListener('change', render);
+
+// ---- Calendar widget ----
+const MONTH_NAMES = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+let selectedCustomDate = todayStr();
+let [calendarViewYear, calendarViewMonth] = selectedCustomDate.split('-').map(Number);
+calendarViewMonth -= 1;
+
+const calendarToggle = document.getElementById('calendar-toggle');
+const calendarPopup = document.getElementById('calendar-popup');
+
+function updateCalendarToggleLabel() {
+  calendarToggle.textContent = formatDate(selectedCustomDate);
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  const label = document.getElementById('cal-month-label');
+  label.textContent = `${MONTH_NAMES[calendarViewMonth]} ${calendarViewYear}`;
+
+  const first = new Date(calendarViewYear, calendarViewMonth, 1);
+  const startDay = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
+
+  let html = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+  for (let i = 0; i < startDay; i++) html += '<div class="cal-cell empty"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calendarViewYear}-${String(calendarViewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const classes = ['cal-cell'];
+    if (dateStr === selectedCustomDate) classes.push('selected');
+    if (dateStr === todayStr()) classes.push('today');
+    html += `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}">${d}</button>`;
+  }
+  grid.innerHTML = html;
+}
+
+updateCalendarToggleLabel();
+
+calendarToggle.addEventListener('click', () => {
+  calendarPopup.hidden = !calendarPopup.hidden;
+  if (!calendarPopup.hidden) renderCalendar();
+});
+
+document.getElementById('cal-prev').addEventListener('click', () => {
+  calendarViewMonth -= 1;
+  if (calendarViewMonth < 0) { calendarViewMonth = 11; calendarViewYear -= 1; }
+  renderCalendar();
+});
+
+document.getElementById('cal-next').addEventListener('click', () => {
+  calendarViewMonth += 1;
+  if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear += 1; }
+  renderCalendar();
+});
+
+document.getElementById('calendar-grid').addEventListener('click', e => {
+  const cell = e.target.closest('.cal-cell:not(.empty)');
+  if (!cell) return;
+  selectedCustomDate = cell.dataset.date;
+  updateCalendarToggleLabel();
+  calendarPopup.hidden = true;
+  renderCalendar();
+  render();
+});
+
+document.addEventListener('click', e => {
+  if (!calendarPopup.hidden && !e.target.closest('.calendar-widget')) {
+    calendarPopup.hidden = true;
+  }
+});
 
 // ---- Table row actions ----
 document.getElementById('table-body').addEventListener('click', e => {

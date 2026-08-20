@@ -58,10 +58,20 @@
         <button class="chip" data-range="range">Tarih Aralığı</button>
       </div>
       <div class="filter-dates" id="filter-dates">
-        <label class="date-field" id="custom-date-field" hidden>
+        <div class="date-field" id="custom-date-field" hidden>
           Tarih
-          <input type="date" id="custom-date">
-        </label>
+          <div class="calendar-widget">
+            <button type="button" class="calendar-toggle" id="calendar-toggle"></button>
+            <div class="calendar-popup" id="calendar-popup" hidden>
+              <div class="calendar-header">
+                <button type="button" class="cal-nav" id="cal-prev">‹</button>
+                <span id="cal-month-label"></span>
+                <button type="button" class="cal-nav" id="cal-next">›</button>
+              </div>
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+          </div>
+        </div>
         <label class="date-field" id="range-start-field" hidden>
           Başlangıç
           <input type="date" id="range-start">
