@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Motor Monitoring Dashboard: generated at runtime, not source
+motor-monitor/motor_data.csv
