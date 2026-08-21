@@ -3,6 +3,8 @@ import time
 from datetime import datetime
 import csv
 
+from config import ALARM_THRESHOLDS
+
 file = open("motor_data.csv", "a", newline="")
 writer = csv.writer(file)
 
@@ -23,13 +25,13 @@ try:
 
         alarms = []
 
-        if reading["temperature"] > 80:
+        if reading["temperature"] > ALARM_THRESHOLDS.temperature:
             alarms.append("HIGH TEMPERATURE")
 
-        if reading["vibration"] > 8:
+        if reading["vibration"] > ALARM_THRESHOLDS.vibration:
             alarms.append("HIGH VIBRATION")
 
-        if reading["current"] > 13:
+        if reading["current"] > ALARM_THRESHOLDS.current:
             alarms.append("HIGH CURRENT")
 
         for alarm in alarms:

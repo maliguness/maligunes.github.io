@@ -1,5 +1,7 @@
 import random
 
+from config import RANGES
+
 rpm = 0
 temperature = 25.0
 vibration = 0.5
@@ -53,8 +55,8 @@ def get_reading():
         target_current = 8.0
         current += (target_current - current) * 0.2
 
-    rpm = max(0, min(3000, rpm))
-    current = max(0, min(15, current))
+    rpm = max(RANGES.rpm_min, min(RANGES.rpm_max, rpm))
+    current = max(RANGES.current_min, min(RANGES.current_max, current))
 
     # Temperature
     target_temperature = 25 + current * 3.5
@@ -64,7 +66,7 @@ def get_reading():
 
     temperature += (target_temperature - temperature) * 0.08
     temperature += random.uniform(-0.2, 0.2)
-    temperature = max(20, min(100, temperature))
+    temperature = max(RANGES.temperature_min, min(RANGES.temperature_max, temperature))
 
     # Vibration
     target_vibration = 1.0 + (rpm / 3000) * 3
@@ -74,7 +76,7 @@ def get_reading():
 
     vibration += (target_vibration - vibration) * 0.25
     vibration += random.uniform(-0.3, 0.3)
-    vibration = max(0, min(10, vibration))
+    vibration = max(RANGES.vibration_min, min(RANGES.vibration_max, vibration))
 
     return {
         "rpm": int(rpm),
