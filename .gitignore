@@ -5,6 +5,10 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# Env files
+.env
+.env.*
+
 # Editor
 .DS_Store
 .vscode/
