@@ -275,9 +275,25 @@ function renderCalendar() {
 
 updateCalendarToggleLabel();
 
+function positionCalendarPopup() {
+  calendarPopup.style.left = '';
+  calendarPopup.style.right = '';
+  const rect = calendarPopup.getBoundingClientRect();
+  if (rect.right > window.innerWidth - 8) {
+    calendarPopup.style.left = 'auto';
+    calendarPopup.style.right = '0';
+  } else if (rect.left < 8) {
+    calendarPopup.style.left = '0';
+    calendarPopup.style.right = 'auto';
+  }
+}
+
 calendarToggle.addEventListener('click', () => {
   calendarPopup.hidden = !calendarPopup.hidden;
-  if (!calendarPopup.hidden) renderCalendar();
+  if (!calendarPopup.hidden) {
+    renderCalendar();
+    positionCalendarPopup();
+  }
 });
 
 document.getElementById('cal-prev').addEventListener('click', () => {
